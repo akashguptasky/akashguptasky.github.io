@@ -12,23 +12,23 @@
     font-family:"Calibri","Segoe UI",Arial,sans-serif;
     color:var(--ink);
     background:#fff;
-    font-size:10.6pt;
-    line-height:1.42;
+    font-size:10.3pt;
+    line-height:1.27;
   }
-  .page{max-width:820px;margin:0 auto;padding:30px 40px 40px;}
+  .page{max-width:820px;margin:0 auto;padding:24px 40px 32px;}
 
-  header{border-bottom:2px solid var(--accent);padding-bottom:10px;margin-bottom:14px;}
-  h1{font-size:24pt;margin:0;letter-spacing:.3px;color:var(--ink);}
+  header{border-bottom:2px solid var(--accent);padding-bottom:8px;margin-bottom:12px;}
+  h1{font-size:20pt;margin:0;letter-spacing:.3px;color:var(--ink);}
   .subtitle{font-size:11pt;color:var(--accent);font-weight:600;margin:3px 0 8px;}
   .contact{font-size:9.6pt;color:var(--muted);}
   .contact a{color:var(--muted);text-decoration:none;}
   .contact span{white-space:nowrap;}
   .sep{color:var(--line);margin:0 7px;}
 
-  section{margin:0 0 13px;}
+  section{margin:0 0 8px;}
   h2{
     font-size:11pt;text-transform:uppercase;letter-spacing:1px;
-    color:var(--accent);margin:0 0 7px;padding-bottom:3px;
+    color:var(--accent);margin:0 0 6px;padding-bottom:3px;
     border-bottom:1px solid var(--line);
   }
   p{margin:0 0 6px;}
@@ -38,19 +38,19 @@
   .skills .k{font-weight:700;color:var(--ink);}
   .skills .v{color:var(--muted);}
 
-  .job{margin-bottom:11px;}
+  .job{margin-bottom:9px;}
   .job:last-child{margin-bottom:0;}
   .job .top{display:flex;justify-content:space-between;align-items:baseline;gap:12px;}
   .job .role{font-weight:700;font-size:10.8pt;color:var(--ink);}
   .job .co{color:var(--accent);font-weight:600;}
   .job .meta{color:var(--muted);font-size:9.5pt;white-space:nowrap;}
-  ul{margin:4px 0 0;padding-left:17px;}
-  li{margin-bottom:2.5px;color:var(--ink);}
+  ul{margin:3px 0 0;padding-left:16px;}
+  li{margin-bottom:1.5px;color:var(--ink);}
   .company-block{margin-bottom:12px;}
   .company-head{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px dotted var(--line);padding-bottom:2px;margin-bottom:5px;}
   .company-head .co{font-weight:700;font-size:10.9pt;color:var(--accent);}
   .company-head .span{color:var(--muted);font-size:9.5pt;}
-  .subrole{margin:0 0 7px;}
+  .subrole{margin:0 0 5px;}
   .subrole .rl{font-weight:700;color:var(--ink);}
   .subrole .dt{color:var(--muted);font-size:9.5pt;}
 
@@ -78,11 +78,11 @@
   .dl-btn:focus-visible{outline:3px solid #7FA8D4;outline-offset:2px;}
 
   @media print{
-    @page{size:A4;margin:12mm;}
-    body{font-size:10.2pt;}
+    @page{size:A4;margin:9mm;}
+    body{font-size:9.3pt;}
     .page{max-width:none;margin:0;padding:0;}
-    section{page-break-inside:avoid;}
-    .job,.company-block,.proj{page-break-inside:avoid;}
+    h2{break-after:avoid;}
+    .job,.subrole,.proj{page-break-inside:avoid;}
     a{color:var(--muted) !important;}
     .dl-btn{display:none !important;}
   }
@@ -107,7 +107,7 @@
 
   <section>
     <h2>Professional Summary</h2>
-    <p class="summary">Backend-focused full-stack engineer with 3+ years of experience building scalable Node.js and TypeScript services, REST APIs, and microservices. Skilled in MongoDB, PostgreSQL, and Redis, with hands-on work in workflow automation, API gateway design, and performance optimization. Proven record of improving service performance, reducing latency, and delivering features end to end from data model to user interface.</p>
+    <p class="summary">Backend-focused full-stack engineer with 3+ years building scalable Node.js and TypeScript services, REST APIs, and microservices. Skilled in MongoDB, PostgreSQL, and Redis, with hands-on work in workflow automation, API gateway design, and performance optimization. Proven record of improving performance, reducing latency, and shipping features end to end.</p>
   </section>
 
   <section>
@@ -133,8 +133,7 @@
       <ul>
         <li>Build and own features end to end on a multi-tenant CRM and sales-automation platform, spanning MongoDB data models, Node.js and TypeScript services, and the React front end.</li>
         <li>Design workflow-automation components (triggers, actions, and asynchronous approval flows) on a Redis and BullMQ job pipeline, enabling non-technical users to automate multi-step business processes.</li>
-        <li>Implement AI-agent tool-calling and linked-entity resolution within the workflow engine.</li>
-        <li>Strengthen platform security through cross-tenant data isolation and authentication hardening.</li>
+        <li>Implement AI-agent tool-calling and linked-entity resolution, and strengthen platform security through cross-tenant data isolation and authentication hardening.</li>
       </ul>
     </div>
 
@@ -149,8 +148,7 @@
         <ul>
           <li>Built and optimized Node.js microservices, improving service performance by approximately 15%.</li>
           <li>Led a platform migration and admin-panel revamp following a company acquisition.</li>
-          <li>Designed API gateways that reduced request latency by approximately 20%.</li>
-          <li>Mentored junior developers and ensured on-time delivery of releases.</li>
+          <li>Designed API gateways that reduced request latency by approximately 20%; mentored junior developers and ensured on-time releases.</li>
         </ul>
       </div>
 
@@ -158,16 +156,14 @@
         <div class="top"><span class="rl">Junior Software Engineer</span> <span class="dt">May 2023 - Mar 2024 &nbsp;|&nbsp; Gurugram</span></div>
         <ul>
           <li>Integrated a PAN-tampering detection API to identify and flag fraudulent documents.</li>
-          <li>Developed Angular modules that improved user engagement.</li>
-          <li>Worked hands-on with AWS services and MySQL.</li>
+          <li>Developed Angular modules that improved user engagement; worked hands-on with AWS services and MySQL.</li>
         </ul>
       </div>
 
       <div class="subrole">
         <div class="top"><span class="rl">Graduate Engineer Trainee</span> <span class="dt">Nov 2022 - Apr 2023 &nbsp;|&nbsp; Gurugram (On-site)</span></div>
         <ul>
-          <li>Built and maintained backend Node.js services and REST APIs.</li>
-          <li>Progressed into the core engineering track within six months.</li>
+          <li>Built and maintained backend Node.js services and REST APIs; promoted to Junior Software Engineer within six months.</li>
         </ul>
       </div>
     </div>
@@ -189,11 +185,6 @@
       <span class="n">URL Shortener</span> &nbsp;<span class="stack">Node.js, Express, Redis, MongoDB</span><br>
       <span class="d">Short-link service that generates unique codes and resolves them quickly using Redis caching, with URL validation on input.</span>
       <a href="https://github.com/akashguptasky/URL-Shortner/tree/project/urlShortnerGroup50"> github.com/akashguptasky/URL-Shortner</a>
-    </div>
-    <div class="proj">
-      <span class="n">Book Management API</span> &nbsp;<span class="stack">Node.js, Express, MongoDB, JWT</span><br>
-      <span class="d">REST API for managing books and reviews with JWT-protected routes, full CRUD, and request validation.</span>
-      <a href="https://github.com/akashguptasky/Book_management_project/tree/project/booksManagementGroup3"> github.com/akashguptasky/Book_management_project</a>
     </div>
     <div class="proj">
       <span class="n">Blogging Site API</span> &nbsp;<span class="stack">Node.js, Express, MongoDB, JWT</span><br>
