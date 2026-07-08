@@ -1,0 +1,632 @@
+<title>Akash Gupta — Full-Stack Engineer</title>
+<style>
+  :root{
+    --ground:#0B0A1F;
+    --panel:#14122E;
+    --panel-2:#1B1840;
+    --text:#E6E4FF;
+    --muted:#8F8AC8;
+    --dim:#4A4680;
+    --accent:#FF2E97;
+    --accent-soft:#FF6FB5;
+    --accent-2:#22E0FF;
+    --line:#2C2960;
+    --mono:"SFMono-Regular",ui-monospace,"Cascadia Code","Consolas","Menlo","DejaVu Sans Mono",monospace;
+    --sans:"Inter",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    --glow:0 0 3px rgba(255,46,151,.6),0 0 16px rgba(255,46,151,.30);
+    --glow-c:0 0 3px rgba(34,224,255,.6),0 0 16px rgba(34,224,255,.30);
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--ground);
+    color:var(--text);
+    font-family:var(--mono);
+    font-size:16px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+
+  /* ── WebGL synthwave grid backdrop ── */
+  #gl{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;display:block;}
+
+  /* ── cinematic boot intro ── */
+  #bootscreen{
+    position:fixed;inset:0;z-index:9999;background:#07061A;color:var(--text);
+    font-family:var(--mono);font-size:clamp(12px,1.7vw,14.5px);line-height:1.65;
+    display:flex;flex-direction:column;justify-content:flex-start;
+    padding:20vh 8vw 0;gap:2px;overflow:hidden;transition:opacity .6s ease;
+  }
+  #bootscreen.done{opacity:0;pointer-events:none;}
+  #bootscreen::after{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background:repeating-linear-gradient(to bottom,rgba(0,0,0,0) 0,rgba(0,0,0,0) 2px,rgba(0,0,0,.18) 3px,rgba(0,0,0,0) 4px);
+    mix-blend-mode:multiply;opacity:.6;
+  }
+  #bootscreen .bl{white-space:pre-wrap;}
+  #bootscreen .ok{color:#39FF88;}
+  #bootscreen .bar{margin-top:10px;width:min(440px,72vw);height:11px;border:1px solid var(--line);border-radius:3px;overflow:hidden;background:rgba(255,255,255,.03);}
+  #bootscreen .bar > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent-2));box-shadow:var(--glow);transition:width .12s linear;}
+  #bootscreen .welcome{color:var(--accent-2);font-size:clamp(16px,2.6vw,20px);margin-top:16px;text-shadow:var(--glow-c);}
+  #bootscreen .welcome b{color:var(--accent);text-shadow:var(--glow);}
+  #bootscreen .bc{display:inline-block;width:8px;height:1em;background:var(--accent-2);vertical-align:-2px;margin-left:2px;animation:blink 1s steps(2,start) infinite;}
+
+  /* CRT scanline atmosphere (over everything) */
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:12;
+    background:repeating-linear-gradient(to bottom,rgba(0,0,0,0) 0px,rgba(0,0,0,0) 2px,rgba(0,0,0,.13) 3px,rgba(0,0,0,0) 4px);
+    mix-blend-mode:multiply;opacity:.5;
+  }
+  /* readability scrim behind content columns */
+  body::after{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:1;
+    background:
+      linear-gradient(90deg,rgba(11,10,31,.6),transparent 22%,transparent 78%,rgba(11,10,31,.6)),
+      radial-gradient(ellipse at 50% 42%,transparent 30%,rgba(11,10,31,.35) 75%);
+  }
+
+  a{color:var(--accent-2);text-decoration:none;}
+  a:hover{color:var(--accent);}
+  a:focus-visible{outline:2px solid var(--accent-2);outline-offset:3px;}
+
+  .shell{max-width:940px;margin:0 auto;padding:0 20px 120px;position:relative;z-index:2;}
+
+  /* ── window chrome bar ── */
+  .chrome{
+    position:sticky;top:0;z-index:20;max-width:940px;margin:0 auto;
+    display:flex;align-items:center;gap:14px;padding:11px 18px;
+    background:rgba(20,18,46,.78);backdrop-filter:blur(10px);
+    border:1px solid var(--line);border-top:none;border-radius:0 0 10px 10px;
+  }
+  .dots{display:flex;gap:8px;}
+  .dot{width:12px;height:12px;border-radius:50%;}
+  .dot.r{background:#FF2E97;box-shadow:0 0 8px rgba(255,46,151,.7);}
+  .dot.y{background:#B14BFF;box-shadow:0 0 8px rgba(177,75,255,.6);}
+  .dot.g{background:#22E0FF;box-shadow:0 0 8px rgba(34,224,255,.7);}
+  .chrome .title{color:var(--muted);font-size:13px;letter-spacing:.02em;}
+  .chrome .title b{color:var(--accent);font-weight:600;}
+  .chrome nav{margin-left:auto;display:flex;gap:20px;}
+  .chrome nav a{color:var(--muted);font-size:13px;}
+  .chrome nav a:hover{color:var(--accent);text-shadow:var(--glow);}
+  @media(max-width:640px){.chrome nav{display:none;}.chrome .title{font-size:11px;}}
+
+  /* ── prompt primitives ── */
+  .prompt{display:block;color:var(--muted);font-size:14px;margin:0 0 4px;}
+  .prompt .u{color:var(--accent-2);}
+  .prompt .p{color:var(--dim);}
+  .prompt .c{color:var(--text);}
+  .cursor{
+    display:inline-block;width:9px;height:1.05em;background:var(--accent-2);
+    vertical-align:-2px;margin-left:3px;box-shadow:var(--glow-c);
+    animation:blink 1.05s steps(2,start) infinite;
+  }
+  @keyframes blink{0%,50%{opacity:1;}50.01%,100%{opacity:0;}}
+
+  /* ── hero ── */
+  .hero{padding:64px 0 44px;border-bottom:1px dashed var(--line);}
+  .hero .boot{min-height:26px;color:var(--muted);font-size:14px;margin-bottom:22px;}
+  .hero .boot .ok{color:var(--accent-2);}
+  .hero h1{
+    font-family:var(--mono);font-size:clamp(40px,9vw,86px);
+    line-height:.98;font-weight:700;letter-spacing:-.02em;margin:0;
+    color:var(--accent);
+    text-shadow:0 0 5px rgba(255,46,151,.7),0 0 28px rgba(255,46,151,.4);
+  }
+  .hero h1 .lo{color:var(--accent-2);text-shadow:0 0 5px rgba(34,224,255,.6),0 0 26px rgba(34,224,255,.35);}
+  .hero .role{margin:20px 0 0;font-size:clamp(16px,2.4vw,21px);color:var(--text);max-width:660px;text-shadow:0 1px 8px rgba(0,0,0,.6);}
+  .hero .role .hl{color:var(--accent);}
+  .hero .meta{margin-top:28px;display:flex;flex-wrap:wrap;gap:10px 26px;color:var(--muted);font-size:13.5px;}
+  .hero .meta span::before{content:"▹ ";color:var(--accent-2);}
+
+  /* ── generic section ── */
+  section{padding:64px 0;border-bottom:1px dashed var(--line);}
+  .cmd{font-size:15px;color:var(--muted);margin-bottom:26px;letter-spacing:.01em;}
+  .cmd .u{color:var(--accent-2);}
+  .cmd .p{color:var(--dim);}
+  .cmd .c{color:var(--accent);font-weight:600;}
+  .cmd .arg{color:var(--text);}
+  h2{font-family:var(--sans);font-size:clamp(24px,4vw,34px);letter-spacing:-.01em;margin:0 0 8px;color:var(--text);font-weight:700;text-shadow:0 1px 10px rgba(0,0,0,.5);}
+
+  /* ── about ── */
+  .about-body{font-family:var(--sans);max-width:680px;line-height:1.8;color:var(--text);}
+  .about-body p{margin:0 0 16px;text-shadow:0 1px 8px rgba(0,0,0,.5);}
+  .about-body .k{color:var(--accent-2);font-family:var(--mono);font-size:.92em;}
+  .stat-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px;perspective:1000px;}
+  .stat{
+    border:1px solid var(--line);border-radius:8px;padding:14px 20px;
+    background:linear-gradient(180deg,rgba(27,24,64,.92),rgba(11,10,31,.92));min-width:120px;
+    transition:transform .18s ease,border-color .18s ease;
+  }
+  .stat b{display:block;font-family:var(--mono);font-size:26px;color:var(--accent);text-shadow:var(--glow);line-height:1;}
+  .stat span{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.05em;}
+
+  /* ── skills ── */
+  .stack{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;perspective:1000px;}
+  .stack .grp{
+    border:1px solid var(--line);border-radius:8px;padding:16px 18px;
+    background:linear-gradient(180deg,rgba(27,24,64,.92),rgba(11,10,31,.9));
+    transition:transform .18s ease,border-color .18s ease;
+    transform-style:preserve-3d;will-change:transform;
+  }
+  .stack .grp:hover{border-color:var(--accent);box-shadow:var(--glow);}
+  .stack .grp h3{font-family:var(--mono);font-size:13px;text-transform:uppercase;letter-spacing:.12em;color:var(--accent-2);margin:0 0 12px;font-weight:600;}
+  .stack .grp h3::before{content:"# ";color:var(--dim);}
+  .chips{display:flex;flex-wrap:wrap;gap:7px;}
+  .chip{font-family:var(--mono);font-size:12.5px;color:var(--text);border:1px solid var(--line);background:var(--panel-2);padding:4px 10px;border-radius:5px;}
+  .chip:hover{border-color:var(--accent-2);color:var(--accent-2);}
+
+  /* ── projects ── */
+  .projects{display:grid;gap:16px;perspective:1100px;}
+  .proj{
+    border:1px solid var(--line);border-radius:10px;padding:22px 24px;
+    background:linear-gradient(180deg,rgba(27,24,64,.94),rgba(11,10,31,.92));
+    transition:transform .18s ease,border-color .2s ease,box-shadow .2s ease;
+    transform-style:preserve-3d;will-change:transform;
+  }
+  .proj:hover{border-color:var(--accent);box-shadow:var(--glow);}
+  .proj .head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:10px;}
+  .proj .idx{font-family:var(--mono);color:var(--accent-2);font-size:14px;}
+  .proj h3{font-family:var(--sans);font-size:20px;margin:0;color:var(--text);font-weight:700;flex:1;}
+  .proj .tag{font-family:var(--mono);font-size:11.5px;color:var(--accent-soft);border:1px solid var(--line);padding:2px 8px;border-radius:20px;}
+  .proj p{font-family:var(--sans);color:var(--muted);margin:0 0 14px;line-height:1.7;}
+  .proj .foot{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
+  .proj .tech{display:flex;flex-wrap:wrap;gap:6px;}
+  .proj .tech span{font-family:var(--mono);font-size:12px;color:var(--accent-2);}
+  .proj .tech span::after{content:" ·";color:var(--dim);}
+  .proj .tech span:last-child::after{content:"";}
+  .proj .repo{font-family:var(--mono);font-size:12.5px;}
+  .proj .repo::before{content:"❯ ";color:var(--accent);}
+
+  /* ── experience / git log ── */
+  .log{position:relative;padding-left:26px;}
+  .log::before{content:"";position:absolute;left:5px;top:6px;bottom:6px;width:1px;background:linear-gradient(180deg,var(--accent),var(--accent-2));}
+  .commit{position:relative;padding:0 0 26px;}
+  .commit:last-child{padding-bottom:0;}
+  .commit::before{content:"";position:absolute;left:-24px;top:6px;width:11px;height:11px;border-radius:50%;background:var(--ground);border:2px solid var(--accent);box-shadow:var(--glow);}
+  .commit .hash{font-family:var(--mono);color:var(--accent-2);font-size:13px;}
+  .commit .when{font-family:var(--mono);color:var(--dim);font-size:12.5px;margin-left:8px;}
+  .commit h3{font-family:var(--sans);font-size:18px;margin:6px 0 2px;color:var(--text);}
+  .commit .org{font-family:var(--mono);font-size:13px;color:var(--accent-soft);margin-bottom:8px;}
+  .commit ul{margin:6px 0 0;padding-left:18px;}
+  .commit li{font-family:var(--sans);color:var(--muted);line-height:1.7;margin-bottom:3px;}
+  .commit p{font-family:var(--sans);color:var(--muted);margin:0;line-height:1.7;max-width:620px;}
+
+  /* ── certs ── */
+  .certs{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-top:8px;}
+  .cert{border:1px solid var(--line);border-radius:8px;padding:14px 16px;background:rgba(27,24,64,.9);}
+  .cert b{font-family:var(--sans);color:var(--text);font-size:15px;display:block;}
+  .cert span{font-family:var(--mono);font-size:12px;color:var(--muted);}
+
+  /* ── contact ── */
+  .contact-grid{display:flex;flex-wrap:wrap;gap:14px;margin-top:6px;}
+  .link-btn{
+    display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:14px;
+    border:1px solid var(--line);border-radius:8px;padding:12px 18px;color:var(--text);
+    background:rgba(27,24,64,.9);transition:all .18s ease;
+  }
+  .link-btn .ic{color:var(--accent-2);font-weight:700;}
+  .link-btn:hover{border-color:var(--accent);color:var(--accent);box-shadow:var(--glow);transform:translateY(-2px);}
+  .contact-note{font-family:var(--sans);color:var(--muted);margin:0 0 24px;max-width:600px;}
+
+  footer{padding:40px 0 0;color:var(--dim);font-size:12.5px;text-align:center;}
+  footer .blink{color:var(--accent);}
+
+  @media(prefers-reduced-motion:reduce){
+    .cursor{animation:none;opacity:1;}
+    html{scroll-behavior:auto;}
+    .proj,.stack .grp,.stat{transition:none;}
+  }
+</style>
+
+<canvas id="gl" aria-hidden="true"></canvas>
+<div id="bootscreen" aria-hidden="true"></div>
+
+<header class="chrome">
+  <div class="dots"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span></div>
+  <span class="title"><b>akash</b>@backend: ~/portfolio</span>
+  <nav>
+    <a href="#about">about</a>
+    <a href="#skills">stack</a>
+    <a href="#projects">projects</a>
+    <a href="#experience">log</a>
+    <a href="#contact">contact</a>
+    <a href="https://github.com/akashguptasky" target="_blank" rel="noopener" style="color:var(--accent-2);">github ↗</a>
+  </nav>
+</header>
+
+<main class="shell">
+
+  <section class="hero" aria-label="Introduction">
+    <div class="boot" id="boot" aria-hidden="true"></div>
+    <span class="prompt"><span class="u">akash</span><span class="p">@dev</span><span class="p">:~$</span> <span class="c">whoami</span></span>
+    <h1>Akash<span class="lo">.Gupta()</span></h1>
+    <p class="role">Senior Software Engineer building a multi-tenant <span class="hl">CRM &amp; workflow-automation</span> platform end-to-end — backed by 3+ years of backend depth in Node.js microservices, APIs, and performance work.<span class="cursor" aria-hidden="true"></span></p>
+    <div class="meta">
+      <span>TypeScript · Node · React</span>
+      <span>MongoDB · Redis · BullMQ</span>
+      <span>Workflow engines &amp; AI tool-calling</span>
+    </div>
+  </section>
+
+  <section id="about" aria-label="About">
+    <p class="cmd"><span class="u">akash</span><span class="p">@dev:~$</span> <span class="c">cat</span> <span class="arg">about.md</span></p>
+    <h2>The short version</h2>
+    <div class="about-body">
+      <p>Right now I'm a <span class="k">Senior Software Engineer</span> building a multi-tenant CRM and sales-automation platform end-to-end — from <span class="k">MongoDB</span> schemas and <span class="k">BullMQ</span> job pipelines up to the <span class="k">React</span> surface people click. I own workflow-automation features, AI-agent tooling, and platform security.</p>
+      <p>Before that I spent nearly three years growing from trainee to Software Engineer at Deltatech Gaming, where I built <span class="k">Node.js</span> microservices that cut latency and lifted throughput, led a platform migration and admin revamp after an acquisition, and integrated a PAN-tampering API to catch fraud. I also mentored junior developers and kept delivery on schedule.</p>
+      <p>Outside the day job I ship small, useful things — automation bots, e-commerce back-ends — and keep learning by rebuilding systems from scratch until I actually understand them.</p>
+      <div class="stat-row">
+        <div class="stat tilt"><b>3+</b><span>YEARS EXP</span></div>
+        <div class="stat tilt"><b>15%</b><span>PERF GAIN</span></div>
+        <div class="stat tilt"><b>20%</b><span>LOWER LATENCY</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="skills" aria-label="Tech stack">
+    <p class="cmd"><span class="u">akash</span><span class="p">@dev:~$</span> <span class="c">ls</span> <span class="arg">-la stack/</span></p>
+    <h2>What I build with</h2>
+    <div class="stack">
+      <div class="grp tilt">
+        <h3>Languages</h3>
+        <div class="chips">
+          <span class="chip">TypeScript</span><span class="chip">JavaScript</span>
+          <span class="chip">Node.js</span><span class="chip">Java (J2SE)</span><span class="chip">SQL</span>
+        </div>
+      </div>
+      <div class="grp tilt">
+        <h3>Frameworks</h3>
+        <div class="chips">
+          <span class="chip">Express.js</span><span class="chip">NestJS</span>
+          <span class="chip">Angular</span><span class="chip">React</span>
+        </div>
+      </div>
+      <div class="grp tilt">
+        <h3>Databases</h3>
+        <div class="chips">
+          <span class="chip">MongoDB</span><span class="chip">PostgreSQL</span>
+          <span class="chip">Redis</span><span class="chip">SQL</span>
+        </div>
+      </div>
+      <div class="grp tilt">
+        <h3>Architecture</h3>
+        <div class="chips">
+          <span class="chip">Microservices</span><span class="chip">API Gateway</span>
+          <span class="chip">API Design</span><span class="chip">JWT / OAuth</span><span class="chip">Kafka</span>
+        </div>
+      </div>
+      <div class="grp tilt">
+        <h3>Platform &amp; AI</h3>
+        <div class="chips">
+          <span class="chip">Workflow engines</span><span class="chip">BullMQ</span>
+          <span class="chip">AI tool-calling</span><span class="chip">Multi-tenancy</span><span class="chip">WorkOS</span>
+        </div>
+      </div>
+      <div class="grp tilt">
+        <h3>DevOps</h3>
+        <div class="chips">
+          <span class="chip">AWS</span><span class="chip">Docker</span>
+          <span class="chip">CI/CD</span><span class="chip">Git</span>
+        </div>
+      </div>
+      <div class="grp tilt">
+        <h3>Ways of working</h3>
+        <div class="chips">
+          <span class="chip">Agile</span><span class="chip">Postman</span>
+          <span class="chip">Performance tuning</span><span class="chip">Mentoring</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="projects" aria-label="Projects">
+    <p class="cmd"><span class="u">akash</span><span class="p">@dev:~$</span> <span class="c">ls</span> <span class="arg">projects/ --featured</span></p>
+    <h2>Things I've built</h2>
+    <div class="projects">
+
+      <article class="proj tilt">
+        <div class="head">
+          <span class="idx">01</span>
+          <h3>Telegram Auto-Post Publisher</h3>
+          <span class="tag">freelance</span>
+        </div>
+        <p>An automated Telegram bot that schedules and publishes posts across multiple groups on a set cadence, cutting manual posting time by roughly 80%. Built on Node.js and the Telegram Bot API.</p>
+        <div class="foot">
+          <div class="tech"><span>Node.js</span><span>Telegram API</span><span>Scheduling</span></div>
+        </div>
+      </article>
+
+      <article class="proj tilt">
+        <div class="head">
+          <span class="idx">02</span>
+          <h3>E-commerce &amp; Cart Management</h3>
+          <span class="tag">backend</span>
+        </div>
+        <p>A shopping-cart and product back-end covering catalog, cart operations, and order flow — the kind of REST API design and data modelling that underpins any commerce app.</p>
+        <div class="foot">
+          <div class="tech"><span>Node.js</span><span>Express</span><span>MongoDB</span></div>
+          <a class="repo" href="https://github.com/akashguptasky" target="_blank" rel="noopener">github.com/akashguptasky</a>
+        </div>
+      </article>
+
+      <article class="proj tilt">
+        <div class="head">
+          <span class="idx">03</span>
+          <h3>Blogging Mini-Site</h3>
+          <span class="tag">backend</span>
+        </div>
+        <p>A compact blogging platform with authoring, publishing, and content management — a clean CRUD service to practise API structure and auth end-to-end.</p>
+        <div class="foot">
+          <div class="tech"><span>Node.js</span><span>Express</span><span>REST</span></div>
+          <a class="repo" href="https://github.com/akashguptasky" target="_blank" rel="noopener">github.com/akashguptasky</a>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <section id="experience" aria-label="Experience and education">
+    <p class="cmd"><span class="u">akash</span><span class="p">@dev:~$</span> <span class="c">git</span> <span class="arg">log --oneline --author=akash</span></p>
+    <h2>Career log</h2>
+    <div class="log">
+      <div class="commit">
+        <span class="hash">HEAD</span><span class="when">Nov 2025 – Present · Bengaluru · Remote</span>
+        <h3>Senior Software Engineer</h3>
+        <div class="org">DevVoid</div>
+        <ul>
+          <li>Build features end-to-end on a multi-tenant CRM &amp; sales-automation platform.</li>
+          <li>Design workflow-automation nodes — triggers, actions, and async approval flows on BullMQ.</li>
+          <li>Wire AI-agent tool-calling and linked-entity resolution into the workflow engine.</li>
+          <li>Own platform security: cross-tenant isolation and auth hardening.</li>
+          <li>Stack: TypeScript, Node, React, MongoDB, Redis, WorkOS.</li>
+        </ul>
+      </div>
+      <div class="commit">
+        <span class="hash">feat</span><span class="when">Apr 2024 – Sep 2025 · Remote</span>
+        <h3>Software Engineer</h3>
+        <div class="org">Deltatech Gaming Ltd.</div>
+        <ul>
+          <li>Built Node.js microservices that improved performance by ~15%.</li>
+          <li>Led a platform migration and admin revamp after an acquisition.</li>
+          <li>Designed API gateways that reduced latency by ~20%.</li>
+          <li>Mentored junior developers and kept releases on schedule.</li>
+        </ul>
+      </div>
+      <div class="commit">
+        <span class="hash">feat</span><span class="when">May 2023 – Mar 2024 · Gurugram</span>
+        <h3>Junior Software Engineer</h3>
+        <div class="org">Deltatech Gaming Ltd.</div>
+        <ul>
+          <li>Integrated a PAN-tampering API to detect and flag fraud.</li>
+          <li>Built Angular modules that improved user engagement.</li>
+          <li>Worked hands-on with AWS and MySQL.</li>
+        </ul>
+      </div>
+      <div class="commit">
+        <span class="hash">init</span><span class="when">Nov 2022 – Apr 2023 · Gurugram · On-site</span>
+        <h3>Graduate Engineer Trainee (GET)</h3>
+        <div class="org">Deltatech Gaming Ltd.</div>
+        <ul>
+          <li>Started on the backend team building and maintaining Node.js services.</li>
+          <li>Grew into the engineering track and moved up to Junior Software Engineer.</li>
+        </ul>
+      </div>
+      <div class="commit">
+        <span class="hash">feat</span><span class="when">May 2022 – Sep 2022 · Bengaluru</span>
+        <h3>Back End Developer — Apprenticeship</h3>
+        <div class="org">FunctionUp</div>
+        <ul>
+          <li>Learned backend fundamentals building REST APIs with Node.js, Express, and MongoDB.</li>
+          <li>Covered auth, data modelling, and asynchronous programming end-to-end.</li>
+        </ul>
+      </div>
+      <div class="commit">
+        <span class="hash">edu</span><span class="when">2017 – 2020 · Bhopal, MP</span>
+        <h3>BCA — Bachelor of Computer Applications</h3>
+        <div class="org">Ravindranath Tagore University</div>
+      </div>
+    </div>
+
+    <div style="margin-top:40px;">
+      <p class="cmd" style="margin-bottom:16px;"><span class="u">akash</span><span class="p">@dev:~$</span> <span class="c">cat</span> <span class="arg">certifications.txt</span></p>
+      <div class="certs">
+        <div class="cert"><b>Node.js Backend Development</b><span>FunctionUp · 2022</span></div>
+        <div class="cert"><b>J2SE — Core Java</b><span>Bytecode IT Solutions · 2022</span></div>
+        <div class="cert"><b>HTML Fundamentals</b><span>GeeksforGeeks · 2021</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" aria-label="Contact">
+    <p class="cmd"><span class="u">akash</span><span class="p">@dev:~$</span> <span class="c">./contact.sh</span></p>
+    <h2>Let's talk</h2>
+    <p class="contact-note">Open to backend and full-stack roles. Fastest way to reach me is email or a call — links below.</p>
+    <div class="contact-grid">
+      <a class="link-btn" href="mailto:skygupta193@gmail.com"><span class="ic">✉</span> skygupta193@gmail.com</a>
+      <a class="link-btn" href="tel:+919140704542"><span class="ic">☏</span> +91 91407 04542</a>
+      <a class="link-btn" href="https://github.com/akashguptasky" target="_blank" rel="noopener"><span class="ic">❯</span> github.com/akashguptasky</a>
+      <a class="link-btn" href="https://linkedin.com/in/akashguptasky" target="_blank" rel="noopener"><span class="ic">in</span> linkedin.com/in/akashguptasky</a>
+      <a class="link-btn" href="Akash-Gupta-Resume.pdf" download><span class="ic">↓</span> Download résumé</a>
+    </div>
+  </section>
+
+  <footer>
+    <p>built from the terminal up · Akash Gupta · 2025 <span class="blink">▮</span></p>
+  </footer>
+
+</main>
+
+<script>
+  /* ── cinematic boot intro overlay ── */
+  (function(){
+    var bs=document.getElementById("bootscreen");
+    if(!bs)return;
+    var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    function finish(){bs.classList.add("done");document.body.style.overflow="";setTimeout(function(){bs.style.display="none";},700);}
+    if(reduce){finish();return;}
+    var steps=[
+      {t:"head",s:"akashOS bootloader v4.0"},
+      {t:"dim",s:"initializing hardware …"},
+      {t:"ok",s:"cpu ............. 8 cores online"},
+      {t:"ok",s:"memory .......... 32 GB"},
+      {t:"ok",s:"gpu ............. WebGL2 enabled"},
+      {t:"dim",s:"mounting services …"},
+      {t:"ok",s:"node runtime .... ready"},
+      {t:"ok",s:"mongodb ......... connected"},
+      {t:"ok",s:"redis ........... connected"},
+      {t:"bar"},
+      {t:"welcome"}
+    ];
+    document.body.style.overflow="hidden";
+    var i=0;
+    function add(step){
+      var el=document.createElement("div");
+      if(step.t==="ok"){el.className="bl";el.innerHTML="<span class='ok'>[ OK ]</span> "+step.s;}
+      else if(step.t==="dim"){el.className="bl";el.style.color="var(--muted)";el.textContent=step.s;}
+      else if(step.t==="head"){el.className="bl";el.style.color="var(--accent)";el.textContent=step.s;}
+      else if(step.t==="bar"){el.className="bl";el.innerHTML="loading portfolio modules<div class='bar'><i></i></div>";}
+      else if(step.t==="welcome"){el.className="welcome";el.innerHTML="&gt; welcome, <b>akash</b> — session started<span class='bc'></span>";}
+      bs.appendChild(el);
+      return el;
+    }
+    function next(){
+      if(i>=steps.length){setTimeout(finish,650);return;}
+      var step=steps[i++];
+      var el=add(step);
+      if(step.t==="bar"){
+        var fill=el.querySelector("i"),p=0;
+        var iv=setInterval(function(){
+          p+=Math.random()*16+7;
+          if(p>=100){p=100;fill.style.width="100%";clearInterval(iv);setTimeout(next,320);}
+          else{fill.style.width=p+"%";}
+        },95);
+        return;
+      }
+      setTimeout(next, step.t==="welcome"?450:(step.t==="head"?260:120));
+    }
+    setTimeout(next,260);
+  })();
+
+  /* ── boot typing (hero) ── */
+  (function(){
+    var boot=document.getElementById("boot");
+    if(!boot)return;
+    var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var lines=[
+      "> booting akash.dev …",
+      "> loading modules: node ✓  react ✓  mongo ✓  redis ✓",
+      "> auth: session established <span class='ok'>[ ok ]</span>"
+    ];
+    if(reduce){boot.innerHTML=lines.join("<br>");return;}
+    var li=0,ci=0;
+    function tick(){
+      if(li>=lines.length)return;
+      var raw=lines[li];
+      ci++;
+      var cur=raw.slice(0,ci);
+      var lastLt=cur.lastIndexOf("<"),lastGt=cur.lastIndexOf(">");
+      if(lastLt>lastGt){ci=raw.indexOf(">",lastLt)+1;cur=raw.slice(0,ci);}
+      var done=boot.getAttribute("data-done")||"";
+      boot.innerHTML=done+cur+"<span class='cursor' style='height:.9em'></span>";
+      if(ci>=raw.length){boot.setAttribute("data-done",done+raw+"<br>");li++;ci=0;setTimeout(tick,260);}
+      else{setTimeout(tick,18);}
+    }
+    setTimeout(tick,300);
+  })();
+
+  /* ── 3D tilt on cards ── */
+  (function(){
+    var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if(reduce)return;
+    document.querySelectorAll(".tilt").forEach(function(el){
+      el.addEventListener("pointermove",function(e){
+        var r=el.getBoundingClientRect();
+        var px=(e.clientX-r.left)/r.width-0.5;
+        var py=(e.clientY-r.top)/r.height-0.5;
+        el.style.transform="rotateX("+(-py*9).toFixed(2)+"deg) rotateY("+(px*11).toFixed(2)+"deg) translateZ(14px)";
+      });
+      el.addEventListener("pointerleave",function(){el.style.transform="";});
+    });
+  })();
+
+  /* ── WebGL synthwave grid (cyberpunk magenta + cyan) ── */
+  (function(){
+    var cvs=document.getElementById("gl");
+    if(!cvs)return;
+    var gl=cvs.getContext("webgl2",{antialias:true,alpha:false});
+    if(!gl){cvs.style.display="none";return;}
+    var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    var vs="#version 300 es\nin vec2 p;void main(){gl_Position=vec4(p,0.0,1.0);}";
+    var fs=[
+      "#version 300 es",
+      "precision highp float;",
+      "uniform vec2 R;uniform float T;",
+      "out vec4 o;",
+      "void main(){",
+      "  vec2 uv=(gl_FragCoord.xy-0.5*R)/R.y;",
+      "  vec3 magenta=vec3(1.0,0.18,0.59);",
+      "  vec3 cyan=vec3(0.13,0.88,1.0);",
+      "  vec3 col=vec3(0.043,0.039,0.121);",                       // deep indigo
+      "  col+=vec3(0.10,0.03,0.16)*smoothstep(-0.1,1.0,uv.y);",   // purple sky top
+      "  float d=length(vec2(uv.x*1.1,uv.y+0.02));",
+      "  col+=magenta*exp(-d*3.6)*0.35;",                          // magenta sun glow
+      "  col+=cyan*exp(-abs(uv.y)*90.0)*0.30;",                   // cyan horizon line
+      "  if(uv.y<-0.02){",
+      "    float z=1.0/(-uv.y);",
+      "    vec2 w=vec2(uv.x*z, z - T*2.4);",
+      "    vec2 g=abs(fract(w)-0.5);",
+      "    vec2 fw=fwidth(w)*1.5;",
+      "    vec2 ln=vec2(1.0)-smoothstep(vec2(0.0),fw,g);",
+      "    float grid=max(ln.x,ln.y);",
+      "    float fog=exp(-z*0.05);",
+      "    vec3 gc=mix(magenta,cyan,clamp(z*0.09,0.0,1.0));",      // near magenta -> far cyan
+      "    col=mix(col,gc,grid*fog*0.9);",
+      "    col+=gc*grid*fog*0.35;",
+      "  }",
+      "  o=vec4(col,1.0);",
+      "}"
+    ].join("\n");
+
+    function sh(type,src){var s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);return s;}
+    var prog=gl.createProgram();
+    gl.attachShader(prog,sh(gl.VERTEX_SHADER,vs));
+    gl.attachShader(prog,sh(gl.FRAGMENT_SHADER,fs));
+    gl.linkProgram(prog);
+    if(!gl.getProgramParameter(prog,gl.LINK_STATUS)){cvs.style.display="none";return;}
+    gl.useProgram(prog);
+
+    var buf=gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER,buf);
+    gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
+    var loc=gl.getAttribLocation(prog,"p");
+    gl.enableVertexAttribArray(loc);
+    gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
+
+    var uR=gl.getUniformLocation(prog,"R");
+    var uT=gl.getUniformLocation(prog,"T");
+
+    function resize(){
+      var dpr=Math.min(window.devicePixelRatio||1,1.6);
+      var w=Math.floor(window.innerWidth*dpr), h=Math.floor(window.innerHeight*dpr);
+      if(cvs.width!==w||cvs.height!==h){cvs.width=w;cvs.height=h;gl.viewport(0,0,w,h);}
+      gl.uniform2f(uR,w,h);
+    }
+    window.addEventListener("resize",resize);
+    resize();
+
+    var t0=null;
+    function frame(ts){
+      if(t0===null)t0=ts;
+      resize();
+      var t=reduce?6.0:(ts-t0)*0.001;
+      gl.uniform1f(uT,t);
+      gl.drawArrays(gl.TRIANGLES,0,3);
+      if(!reduce)requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  })();
+</script>
