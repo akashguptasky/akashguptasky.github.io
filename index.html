@@ -467,12 +467,18 @@
   </section>
 
   <footer>
-    <p>built from the terminal up · Akash Gupta · 2025 <span class="blink">▮</span></p>
+    <p>built from the terminal up · Akash Gupta · <span id="year">2025</span> <span class="blink">▮</span></p>
   </footer>
 
 </main>
 
 <script>
+  /* ── auto year in footer ── */
+  (function(){
+    var y=document.getElementById("year");
+    if(y)y.textContent=new Date().getFullYear();
+  })();
+
   /* ── cinematic boot intro overlay ── */
   (function(){
     var bs=document.getElementById("bootscreen");
